@@ -98,7 +98,7 @@ const Navbar = () => {
         <S.ALink title="Click here to acess categories" to="/categories">
           BUILD A ORDER
         </S.ALink>
-        <S.ALink title="Click here to acess categories" to="/categories">
+        <S.ALink title="Click here to acess categories" to="/about">
           ABOUT
         </S.ALink>
       </S.navPhone>

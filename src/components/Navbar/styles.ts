@@ -108,12 +108,15 @@ export const Hamburguer = styled.div`
 `
 export const navPhone = styled.nav`
   display: none;
+  background-color: ${colors.red};
   &.is-open {
     display: block;
   }
+  position: absolute;
   @media (max-width: ${breakpoints.tablet}) {
     a {
-      padding: 8px 0;
+      padding: 8px 4px;
+      color: ${colors.moreWhite};
       &:hover {
         background-color: ${colors.red};
         color: ${colors.moreWhite};

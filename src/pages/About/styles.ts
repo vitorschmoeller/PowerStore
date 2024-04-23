@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { breakpoints } from '../../styles'
 
 type Props = {
   marginRight?: string
@@ -15,7 +16,22 @@ export const Container = styled.div`
 export const Article = styled.article`
   display: flex;
   margin-bottom: 64px;
-
+  @media (max-width: ${breakpoints.desktop}) {
+    display: block;
+    max-width: 1024px;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    h2 {
+      margin-top: 16px;
+    }
+    img {
+      display: none;
+    }
+    p {
+      margin-bottom: 24px;
+    }
+  }
   img {
     width: 500px;
     height: 300px;
