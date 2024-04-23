@@ -77,6 +77,10 @@ export const ButtonContainer = styled.div`
   margin-top: 38px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.3);
   padding-bottom: 8px;
+
+  @media (max-width: ${breakpoints.tablet}) {
+    flex-wrap: wrap;
+  }
 `
 
 export const PaymentOptions = styled.button<PropsButton>`
