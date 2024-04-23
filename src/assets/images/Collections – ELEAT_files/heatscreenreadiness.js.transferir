@@ -1,0 +1,506 @@
+class ScreenshotReadinessDetector {
+    constructor(config = {}) {
+        this.pageLoaded = false;
+        this._debuHeatScreenShot = config._debuHeatScreenShot;
+        this.scrollThresholdReached = false;
+        this.captureComplete = false;
+        this.lazyLoadSelector = config.lazyLoadSelector || 'img[lazyload]';
+        this.readinessCheckInterval = config.readinessCheckInterval || 1000;
+        this.scrollThreshold = config.scrollThreshold || 0.8;
+        this.screenThreshold = config.screenThreshold || 0.2;
+        this.clickAboveThreshold = false;
+        this.onReadyForScreenshot = config.onReadyForScreenshot || null;
+        this.lazyImagesAll = Array.from(document.querySelectorAll(this.lazyLoadSelector));
+        this.lazyImages = Array.from(this.lazyImagesAll).filter(this.isElementInViewport);
+        this.loadedLazyImages = new Set();
+        this._isQrSCreenShot = window.location.href.indexOf("pk_hsr_capturescreen=1") > 1 ? true : false;
+        this.ReadinessCheckCounter = 0;
+        this.largePopupCount = 0;
+        this._CustomHeatScreenShot = config._CustomHeatScreenShot;
+        this._mouseEnterTriggered = false;
+
+        window.addEventListener('load', () => {
+            this.pageLoaded = true;
+            this.checkReadiness();
+        });
+
+        const scrollListener = () => {
+            if (this.shouldTriggerReadinessCheck() && !this.captureComplete) {
+                this.scrollThresholdReached = true;
+                if (this._debuHeatScreenShot) console.log("startReadinessCheck");
+                this.startReadinessCheck();
+
+                // Remove the scroll event listener once the condition is met
+                window.removeEventListener('scroll', scrollListener, { capture: true, passive: true });
+            }
+        };
+
+        window.addEventListener('scroll', scrollListener, true);
+
+        if (document.readyState === 'complete') {
+            this.pageLoaded = true;
+        }
+
+        this.initLazyLoadObserver();
+
+        this.handleClick = (event) => {
+            const clickY = event.clientY;
+            const thresholdPixels = window.innerHeight * this.screenThreshold;
+
+            const firstVisibleElement = this.findFirstVisibleElement();
+            if (this._debuHeatScreenShot) console.log(firstVisibleElement);
+
+            if (firstVisibleElement) {
+                const elementRect = firstVisibleElement.getBoundingClientRect();
+                const elementTop = elementRect.top;
+                const elementBottom = elementRect.bottom;
+
+                if (clickY >= elementTop && clickY <= elementBottom) {
+                    if (this._debuHeatScreenShot) console.log("Click inside first visible element:", firstVisibleElement);
+                    this.clickAboveThreshold = true;
+                    window.removeEventListener('click', this.handleClick);
+                }
+            } else if (clickY <= thresholdPixels) {
+                if (this._debuHeatScreenShot) console.log("Click above threshold detected.");
+                this.clickAboveThreshold = true;
+                window.removeEventListener('click', this.handleClick);
+            }
+        };
+
+        // Add a click event listener to track clicks above the threshold
+        if (!this._isQrSCreenShot) window.addEventListener('click', this.handleClick);
+    }
+
+    // JavaScript function to find the first visible element with specific tag names or classes
+    findFirstVisibleElement() {
+        const tagNames = ['header', 'nav', 'navigator'];
+        const classNames = ['header', 'nav', 'navigator'];
+
+        let firstVisibleElement = null;
+
+        // Search for elements with specific tag names
+        tagNames.forEach(tagName => {
+            document.querySelectorAll(tagName).forEach(element => {
+                if (this.isElementVisible(element) && (!firstVisibleElement || this.getDocumentOrder(element) < this.getDocumentOrder(firstVisibleElement))) {
+                    firstVisibleElement = element;
+                }
+            });
+        });
+
+        // Search for elements with specific classes or partial matches
+        if (!firstVisibleElement) {
+            classNames.forEach(className => {
+                document.querySelectorAll(`[class*="${className}"]`).forEach(classElement => {
+                    if (this.isElementVisible(classElement) && (!firstVisibleElement || this.getHtmlPosition(classElement) < this.getHtmlPosition(firstVisibleElement))) {
+                        firstVisibleElement = classElement;
+                    }
+                });
+            });
+        }
+
+        return firstVisibleElement; // Return the first visible element found
+    }
+
+    // Helper function to check if an element is visible and has a non-zero height
+    isElementVisible(element) {
+        const style = window.getComputedStyle(element);
+        return style.display !== 'none' && style.visibility !== 'hidden' && element.offsetHeight > 0;
+    }
+
+    // Helper function to get the order of an element in the document structure
+    getDocumentOrder(element) {
+        let order = 0;
+
+        while (element) {
+            order += element.compareDocumentPosition(document.body) === Node.DOCUMENT_POSITION_FOLLOWING ? 1 : 0;
+            element = element.parentNode;
+        }
+
+        return order;
+    }
+
+    getHtmlPosition(element) {
+        const rect = element.getBoundingClientRect();
+        return rect.top;
+    }
+
+    initLazyLoadObserver() {
+        this.lazyImages.forEach(img => {
+            if (this.isElementInViewport(img)) {
+                this.handleLazyImageLoad(img);
+            }
+        });
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    this.handleLazyImageLoad(img);
+                    observer.unobserve(img);
+                }
+            });
+        }, {
+            rootMargin: '0px',
+            threshold: 0.01
+        });
+
+        this.lazyImages.forEach(img => observer.observe(img));
+    }
+    isElementInViewport(element) {
+        const rect = element.getBoundingClientRect();
+        return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        );
+    }
+
+    handleLazyImageLoad(img) {
+        if (img.complete && img.naturalHeight !== 0) {
+            this.loadedLazyImages.add(img);
+            this.checkReadiness();
+        } else {
+            img.onload = () => {
+                this.loadedLazyImages.add(img);
+                this.checkReadiness();
+            };
+        }
+    }
+
+    GetLargePopups() {
+        if(this._CustomHeatScreenShot){
+            return 0;
+        }
+        const modalEle = [];
+        const onScreenModal = [];
+        this.largePopupCount = 0;
+
+        const elements = document.body.querySelectorAll("body *");
+        document.body.style.overflowY = "scroll";
+
+        const iframeRect = document.documentElement.getBoundingClientRect();
+        const documentHeight = document.documentElement.scrollHeight;
+        const excludedClasses = ["schreenshot-modal"];
+
+        for (let i = 0; i < elements.length; i += 1) {
+            if (!excludedClasses.includes(elements[i].className)) {
+                const element = elements[i];
+                const computedStyle = window.getComputedStyle(element);
+
+                const opacity = parseFloat(computedStyle.getPropertyValue("opacity"));
+                const visibility = computedStyle.getPropertyValue("visibility");
+                const display = computedStyle.getPropertyValue("display");
+                const zIndex = parseInt(computedStyle.getPropertyValue("z-index"), 10);
+                const position = computedStyle.getPropertyValue("position");
+                const elementHeight = parseInt(computedStyle.getPropertyValue("height"), 10);
+                let height = computedStyle.getPropertyValue("height");
+
+                if (element.shadowRoot) {
+                    this.detectShadowDomElements(element, iframeRect, documentHeight);
+                }
+
+                if (this.conditions(opacity, visibility, display, zIndex, position, element)) {
+                    modalEle.push(element);
+                }
+            }
+        }
+
+        if (modalEle) {
+            modalEle.forEach((element) => {
+                if (
+                    !importantModals(element) &&
+                    !isSmallHeader(element) &&
+                    !isLeftModal(element, iframeRect?.width / 3) &&
+                    !smallModalIsOkay(element) &&
+                    !hasNoChild(element) &&
+                    this.isInRange(element, (iframeRect?.width || 0) + 10, documentHeight) &&
+                    this.heightMustBeMore(element)
+                ) {
+                    onScreenModal.push(element);
+                }
+            });
+            if (onScreenModal.length) {
+                onScreenModal.forEach((modal) => {
+                    this.nextElementSiblingIsOverlay(modal);
+                    this.largePopupCount++;
+                    if (this._isQrSCreenShot) modal.style.setProperty("display", "none", "important");
+                    if (this._debuHeatScreenShot) console.log("Large popup", modal);
+                });
+            }
+        }        
+        
+
+        function hasNoChild(element) {
+            if (this._debuHeatScreenShot) console.log("Child element count ", element.childElementCount);
+            return element.childElementCount === 0;
+        }
+
+        function isLeftModal(element, width) {
+            const ele = element.getBoundingClientRect();
+            if (
+                ele.left < 100 &&
+                ele.width <= width &&
+                ele.height >= window.innerHeight / 2
+            ) {
+                return true;
+            }
+            return false;
+        }
+
+        function importantModals(element) {
+            const ele = element.getBoundingClientRect();
+            if (
+                ele.top < 100 &&
+                ele.width <= iframeRect.width + 5 &&
+                ele.height <= window.innerHeight / 3
+            ) {
+                return true;
+            }
+            return false;
+        }
+
+        function isSmallHeader(element) {
+            const ele = element.getBoundingClientRect();
+            if (ele.top < 100 && ele.height <= 50) {
+                return true;
+            }
+            return false;
+        }
+
+        function smallModalIsOkay(element) {
+            const ele = element.getBoundingClientRect();
+            if (ele.width <= 100 && ele.height <= 100) {
+                return true;
+            }
+            return false;
+        }
+
+        function isHeightOkay(height) {
+            if (typeof height === "string") return true;
+            return height > 5;
+        }
+
+        function hasNoChild(element) {
+            return element.childElementCount === 0;
+        }       
+
+        
+
+        if (this._debuHeatScreenShot) console.log("Number of large pop-ups:", this.largePopupCount);
+        return this.largePopupCount;
+    }
+
+    isInRange(element, width, height) {
+        const rect = element.getBoundingClientRect();
+        return (
+            rect.top >= -5 &&
+            rect.left >= -10 &&
+            rect.right <= width &&
+            rect.height <= height + 10
+        );
+    }
+
+    heightMustBeMore(element) {
+        const ele = element.getBoundingClientRect();
+        return ele.height > 5;
+    }
+
+    getAllChildren(element) {
+        let children = [];
+        children.push(element);
+        for (let i = 0; i < element.children.length; i += 1) {
+            children = children.concat(this.getAllChildren(element.children[i]));
+        }
+        return children;
+    }       
+
+
+    detectShadowDomElements(element, iframeRect, documentHeight) {
+            const shadowRoot = element.shadowRoot;
+        const hostElement = shadowRoot.host;
+        const subChildren = this.getAllChildren(shadowRoot);
+
+        subChildren.forEach((child) => {
+            if (child instanceof Element) {
+                const computedStyle = window.getComputedStyle(child);
+                const opacity = parseFloat(computedStyle.getPropertyValue("opacity"));
+                const visibility = computedStyle.getPropertyValue("visibility");
+                const display = computedStyle.getPropertyValue("display");
+                const zIndex = parseInt(computedStyle.getPropertyValue("z-index"), 10);
+                const position = computedStyle.getPropertyValue("position");
+                let height = parseInt(computedStyle.getPropertyValue("height"), 10);
+                if (
+                    zIndex > 0 &&
+                    display !== "none" &&
+                    visibility !== "hidden" &&
+                    opacity > 0 &&
+                    position === "fixed" &&
+                    height > 20 &&
+                    !["button"].includes(child.tagName.toLowerCase()) &&
+                    this.isInRange(child, iframeRect.width, documentHeight) &&
+                    this.heightMustBeMore(child)
+                ) {
+                    this.largePopupCount++;
+                    if (this._isQrSCreenShot) hostElement.style.setProperty("display", "none", "important");;
+                    if (this._debuHeatScreenShot) console.log("Large shadow", hostElement);
+                }
+            }
+        });
+    }
+
+    conditions(opacity, visibility, display, zIndex, position, element) {
+        return (
+            zIndex > 0 &&
+            display !== "none" &&
+            visibility !== "hidden" &&
+            opacity > 0 &&
+            !["button"].includes(element.tagName.toLowerCase()) &&
+            position === "fixed"
+        );
+    }
+
+    nextElementSiblingIsOverlay(element) {
+        const overlay = element.nextElementSibling;
+        if (overlay instanceof Element) {
+            const computedStyle = window.getComputedStyle(overlay);
+            const opacity = parseFloat(computedStyle.getPropertyValue("opacity"));
+            const visibility = computedStyle.getPropertyValue("visibility");
+            const display = computedStyle.getPropertyValue("display");
+            const zIndex = parseInt(computedStyle.getPropertyValue("z-index"), 10);
+            const position = computedStyle.getPropertyValue("position");
+            if (this.conditions(opacity, visibility, display, zIndex, position, overlay)) {
+                this.largePopupCount++;
+                if (this._debuHeatScreenShot) console.log("nextElementSiblingIsOverlay ", overlay);
+                if (this._isQrSCreenShot) overlay.style.setProperty("display", "none", "important");
+            }
+        }
+    }
+
+
+    shouldTriggerReadinessCheck() {
+        const scrollPercentage = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight;
+        if (this._debuHeatScreenShot) console.log("scrollPercentage", scrollPercentage);
+        return (
+            scrollPercentage >= this.scrollThreshold &&
+            !this.captureComplete
+        );
+    }
+
+    generateLastHeatSelector(e) {
+        var lastHeatElement = null;        
+        e.preventDefault();
+
+        if (!('target' in e) || !('pageY' in e) || !('pageX' in e) || !e.target) {
+            return;
+        }
+        var rect = e.target.getBoundingClientRect();
+        if (rect.top <= 150 && rect.height <= 90 ) {
+            lastHeatElement = e.target;       
+        } else {
+            return;
+        }
+        var allElements = document.querySelectorAll('.heatmap-com-highligted-element');
+        allElements.forEach(function(element) {            
+            if (element !== lastHeatElement) {               
+                element.classList.remove('heatmap-com-highligted-element');
+            }
+        });
+        if(this._debuHeatScreenShot)console.log('lastHeatElement: ', lastHeatElement);
+        lastHeatElement.classList.add('heatmap-com-highligted-element');
+    }
+    startReadinessCheck() {
+        if (this._CustomHeatScreenShot && !this._mouseEnterTriggered && window.heatmapDeviceType == "Desktop") {            
+            const boundGenerateLastHeatSelector = this.generateLastHeatSelector.bind(this);
+            window.addEventListener('mouseenter', boundGenerateLastHeatSelector, true);
+            this._mouseEnterTriggered = true;
+        }
+        this.readinessCheckInterval = setInterval(() => {
+            if (!this.captureComplete) this.checkReadiness();
+        }, this.readinessCheckInterval);
+    }
+
+    checkReadiness() {
+        if (!window.doscreenshot) {
+            if (this._debuHeatScreenShot) console.log("Page not ready for screenshot");
+            return;
+        }
+
+        if (this._debuHeatScreenShot) console.log("Checking readiness");
+        const allImagesLoaded = this.lazyImages.length > 0 && this.ReadinessCheckCounter <= 10 ? (this.loadedLazyImages.size / this.lazyImages.length) * 100 : 100;
+
+        if (this.pageLoaded && allImagesLoaded >= 75 && this.scrollThresholdReached && !this.clickAboveThreshold && this.GetLargePopups() == 0 && !this.captureComplete) {
+            if (this._debuHeatScreenShot) console.log("Page is ready for screenshot");
+            if(window.DEBUG && heatmapBreakPoints["screenshot-taken"].is_active) { debugger; }
+            if (!this.captureComplete) {
+                clearInterval(this.readinessCheckInterval);
+                window.removeEventListener('mouseenter', this.generateLastHeatSelector, true);
+                this.dispatchEvent();
+                this.captureComplete = true;
+                var aP = window.HeatSessionTracking.getPiwikTrackers();
+                aP.forEach(function(aQ) {
+                    if (
+                      aQ.HeatmapSessionRecording
+                    ) {         
+                      window.HeatSessionTracking.sendQueuedData(aQ); 
+                      if(this._debuHeatScreenShot) console.log("Screenshot process has been called.")         
+                    }
+                }, this);
+            }
+        }
+
+        if (this.clickAboveThreshold) {
+            clearInterval(this.readinessCheckInterval);
+            if (this._debuHeatScreenShot) console.log("Click happened above calculated menu threshhold");
+            this.captureComplete = true;
+        }
+        this.ReadinessCheckCounter++;
+    }
+
+    dispatchEvent() {
+        const event = new Event('pageReadyForScreenshot');
+        document.dispatchEvent(event);
+
+        if (typeof this.onReadyForScreenshot === 'function') {
+            this.onReadyForScreenshot();
+        }
+    }
+
+}
+
+const CheckForCI = window.location.href.indexOf("pk_hsr_capturescreen=1") > 1 ? false : true;
+
+if (CheckForCI) {
+    window.doscreenshot = true;
+}
+
+const HeatTLazyLoadclassList = [
+    "lazy",
+    "lazyload",
+    "Image--fadeIn",
+    "Image--lazyLoad",
+    "transition--fade-in",
+    "fade-in"
+];
+
+const selectedLazyClasses = HeatTLazyLoadclassList.map(className => `img.${className}`).join(", ");
+
+function initializeReadinessDetector() {
+    const readinessDetector = new ScreenshotReadinessDetector({
+        lazyLoadSelector: selectedLazyClasses,
+        readinessCheckInterval: 500,
+        scrollThreshold: CheckForCI ? 0.8 : 0.1,
+        _debuHeatScreenShot: window.location.href.indexOf("pk_hsr_debugscreen=1") > 1 ? true : false,
+        _CustomHeatScreenShot: window.location.href.indexOf("shotOption=hiddenElement") > 1 ? true : false,
+        onReadyForScreenshot: () => {
+            if (this._debuHeatScreenShot) console.log('Custom action when ready for screenshot');
+            window.Heatscreenshotready = true;
+            window.removeEventListener('click', this.handleClick);
+        }
+    });
+
+    document.addEventListener('pageReadyForScreenshot', function() {
+        if (this._debuHeatScreenShot) console.log('Page is now ready for a screenshot.');
+        window.Heatscreenshotready = true;
+        window.removeEventListener('click', this.handleClick);
+    });
+}
