@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { colors } from '../../styles'
+import { breakpoints, colors } from '../../styles'
 
 import productHero from '../../assets/images/productHero.png'
 import { Props } from '.'
@@ -12,6 +12,10 @@ export const Image = styled.div<Props>`
   background-image: url(${(props) =>
     props.image === 'home' ? banner : productHero});
 
+    @media(max-width: ${breakpoints.tablet}){
+
+    }
+
 `
 export const Container = styled.div`
   max-width: 350px;
@@ -19,6 +23,13 @@ export const Container = styled.div`
   small {
     display: block;
     text-align: center;
+  }
+  @media (max-width: ${breakpoints.tablet}) {
+    > div {
+      img {
+        margin-top: 40px;
+      }
+    }
   }
 `
 
@@ -48,6 +59,9 @@ export const Circle = styled.div`
   font-size: 18px;
   margin: 36px 6px 16px 6px;
 
+  @media (max-width: ${breakpoints.tablet}) {
+    margin: 24px 6px 16px 6px;
+  }
   span {
   }
 `
@@ -67,6 +81,10 @@ export const SubTitle = styled.span`
   line-height: 22px;
   font-family: 'Roboto', 'sans-serif';
   font-weight: 400;
+
+  @media (max-width: ${breakpoints.tablet}) {
+    font-size: 16px;
+  }
 `
 export const Button = styled.button`
   background-color: ${colors.red};
@@ -83,6 +101,10 @@ export const Button = styled.button`
   &:hover {
     transform: scale(1.05);
     box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.8);
+  }
+
+  @media (max-width: ${breakpoints.tablet}) {
+    margin-bottom: 8px;
   }
 `
 

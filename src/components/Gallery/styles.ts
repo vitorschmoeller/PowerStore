@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { colors } from '../../styles'
+import { breakpoints, colors } from '../../styles'
 
 export const Container = styled.section`
   padding: 32px 0;
@@ -8,6 +8,10 @@ export const Container = styled.section`
   ul {
     display: flex;
     justify-content: center;
+
+    @media (max-width: ${breakpoints.desktop}) {
+      flex-wrap: wrap;
+    }
 
     li {
       list-style-type: none;

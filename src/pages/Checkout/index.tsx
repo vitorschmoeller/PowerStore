@@ -124,7 +124,7 @@ const Checkout = () => {
   })
 
   useEffect(() => {
-    if (form.values.discount === 'schmoeller') {
+    if (form.values.discount === 'discount') {
       setDiscountedTotal(totalPrice * 0.5)
     } else {
       setDiscountedTotal(totalPrice)
@@ -414,7 +414,7 @@ const Checkout = () => {
                   type="text"
                   id="discount"
                   name="discount"
-                  placeholder="Discount: schmoeller"
+                  placeholder="Discount: discount"
                   value={form.values.discount}
                   onChange={form.handleChange}
                   onBlur={form.handleBlur}

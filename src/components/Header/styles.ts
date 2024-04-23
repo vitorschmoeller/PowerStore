@@ -17,6 +17,11 @@ export const Container = styled.div`
     font-weight: bold;
     margin: 0 88px 0 88px;
     border-bottom: 2px solid ${colors.moreWhite};
+
+    @media (max-width: ${breakpoints.tablet}) {
+      font-size: 12px;
+      text-align: center;
+    }
   }
 
   button {

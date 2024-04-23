@@ -30,6 +30,16 @@ export const List = styled.ul`
     grid-template-columns: repeat(2, 1fr);
     margin: 0;
   }
+  @media (max-width: ${breakpoints.tablet}) {
+    display: block;
+    max-width: 360px;
+
+    li {
+      margin-right: 0;
+      margin-left: 16px;
+      margin-bottom: 16px;
+    }
+  }
 `
 
 export const Li = styled.li`
@@ -40,5 +50,7 @@ export const Li = styled.li`
   a {
     text-decoration: none;
     color: ${colors.black};
+  }
+  @media (max-width: ${breakpoints.tablet}) {
   }
 `

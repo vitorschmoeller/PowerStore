@@ -13,6 +13,7 @@ export const Card = styled.div`
     width: 100%;
     height: 280px;
     border-radius: 8px;
+    max-width: 100%;
   }
 
   h3 {
@@ -29,5 +30,10 @@ export const Card = styled.div`
   }
   @media (max-width: ${breakpoints.desktop}) {
     width: 100%;
+  }
+  @media (max-width: ${breakpoints.tablet}) {
+    img {
+      width: ;
+    }
   }
 `

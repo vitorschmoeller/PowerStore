@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { colors } from '../../styles'
+import { breakpoints, colors } from '../../styles'
 
 type PropsButton = {
   color?: string
@@ -22,10 +22,19 @@ export const Container = styled.div`
   width: 100%;
   height: 100%;
   justify-content: space-between;
+
+  @media (max-width: ${breakpoints.desktop}) {
+    background-color: ${colors.moreWhite};
+    background: none;
+  }
 `
 export const divCont = styled.div`
   display: flex;
   justify-content: space-between;
+  @media (max-width: ${breakpoints.desktop}) {
+    display: flex;
+    flex-direction: column-reverse;
+  }
 `
 export const CartItem = styled.li`
   display: flex;
