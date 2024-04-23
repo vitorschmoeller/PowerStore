@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { colors } from '../../styles'
+import { breakpoints, colors } from '../../styles'
 import { Props } from '.'
 
 export const Container = styled.section<Omit<Props, 'title' | 'suplement'>>`
@@ -22,6 +22,10 @@ export const List = styled.ul`
   grid-template-columns: 1fr 1fr 1fr 1fr;
   column-gap: 16px;
   margin-top: 40px;
+
+  @media (max-width: ${breakpoints.desktop}) {
+    grid-template-columns: 1fr 1fr;
+  }
 `
 
 export const Title = styled.h2`

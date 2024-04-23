@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { colors } from '../../styles'
+import { breakpoints, colors } from '../../styles'
 
 export const Container = styled.div`
   padding: 72px 0;
@@ -24,6 +24,12 @@ export const List = styled.ul`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  @media (max-width: ${breakpoints.desktop}) {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    margin: 0;
+  }
 `
 
 export const Li = styled.li`

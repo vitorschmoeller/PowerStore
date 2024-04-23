@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { colors } from '../../styles'
+import { breakpoints, colors } from '../../styles'
 
 export const Container = styled.section``
 
@@ -33,5 +33,9 @@ export const List = styled.ul`
 
   li {
     list-style-type: none;
+  }
+
+  @media (max-width: ${breakpoints.desktop}) {
+    grid-template-columns: 1fr 1fr;
   }
 `
