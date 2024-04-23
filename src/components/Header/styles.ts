@@ -1,5 +1,5 @@
 import { styled } from 'styled-components'
-import { colors } from '../../styles'
+import { breakpoints, colors } from '../../styles'
 
 export const Container = styled.div`
   background: linear-gradient(to right, #dc5aa3, #8683df);
