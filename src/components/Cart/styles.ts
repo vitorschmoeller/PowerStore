@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { colors } from '../../styles'
+import { breakpoints, colors } from '../../styles'
 import garbage from '../../assets/images/lixo.svg'
 export const Overlay = styled.div`
   position: absolute;
@@ -36,6 +36,9 @@ export const Sidebar = styled.aside`
     line-height: 22px;
     font-weight: bold;
     text-align: center;
+  }
+  @media (max-width: ${breakpoints.tablet}) {
+    max-width: 320px;
   }
 `
 export const ProductContainer = styled.div`

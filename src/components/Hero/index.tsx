@@ -32,7 +32,7 @@ const Hero = ({ image }: Props) => {
                   <S.Span>4.6 stars based on 2850+ REVIEWS</S.Span>
                 </div>
                 <S.Title>
-                  FULL YOUR DAY <br /> WITH POWER
+                  FUEL YOUR DAY <br /> WITH POWER
                 </S.Title>
                 <S.SubTitle>The BR’s #1 HIGH PROTEIN WHEY</S.SubTitle>
                 <S.CircleContainer>

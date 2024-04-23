@@ -1,10 +1,6 @@
 import styled from 'styled-components'
 import { breakpoints, colors } from '../../styles'
 
-type Props = {
-  marginRight?: '14px' | ''
-}
-
 export const Container = styled.section``
 
 export const CardContainer = styled.div`
@@ -16,14 +12,13 @@ export const CardContainer = styled.div`
   }
 `
 
-export const CardButton = styled.div<Props>`
+export const CardButton = styled.div`
   max-width: 600px;
   width: 100%;
   height: 130px;
   background-color: ${colors.gray};
   display: flex;
 
-  // margin-right: ${(props) => (props.marginRight === '14px' ? '14px' : '')};
   flex-direction: column;
   justify-content: center;
   align-items: center;

@@ -39,6 +39,11 @@ export const Header = styled.header`
     color: ${colors.black};
     text-decoration: none;
     font-weight: 900;
+    font-size: 27px;
+
+    @media (max-width: ${breakpoints.desktop}) {
+      font-size: 24px;
+    }
   }
   a {
     text-decoration: none;
