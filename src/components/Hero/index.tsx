@@ -3,7 +3,6 @@ import star from '../../assets/images/star.png'
 import { HashLink } from 'react-router-hash-link'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-import { boolean } from 'yup'
 
 export type Props = {
   image: string
@@ -28,7 +27,7 @@ const Hero = ({ image }: Props) => {
                   <S.Star src={star} alt="" />
                   <S.Star src={star} alt="" />
                   <S.Star src={star} alt="" />
-                  <S.Star src={star} alt="" />
+
                   <S.Span>4.6 stars based on 2850+ REVIEWS</S.Span>
                 </div>
                 <S.Title>

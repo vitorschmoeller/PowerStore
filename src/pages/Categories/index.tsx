@@ -52,7 +52,7 @@ const whey: Suplement[] = [
     image: whey4,
     price: 89.99,
     review: '(1917 Reviews)',
-    subtitle: '9000g ~ From ',
+    subtitle: '900g ~ From ',
     title: 'Whey 100%'
   }
 ]

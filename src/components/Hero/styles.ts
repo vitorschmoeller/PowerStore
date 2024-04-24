@@ -14,6 +14,7 @@ export const Image = styled.div<Props>`
 
     @media(max-width: ${breakpoints.tablet}){
 
+
     }
 
 `
@@ -92,7 +93,7 @@ export const Button = styled.button`
   font-weight: bold;
   border: none;
   width: 100%;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   font-size: 16px;
   line-height: 16px;
   cursor: pointer;
@@ -116,6 +117,10 @@ export const Nav = styled.nav`
     font-size: 18px;
     font-weight: 900;
     padding: 2px 4px;
+
+    @media (max-width: ${breakpoints.tablet}) {
+      font-size: 14px;
+    }
 
     &:hover {
       background-color: ${colors.red};

@@ -17,9 +17,12 @@ const Cart = () => {
     dispatch(close())
   }
   return (
-    <S.CartContainer className={isOpen ? 'is-open' : ''}>
+    <S.CartContainer
+      className={`${isOpen ? 'is-open' : ''}
+  `}
+    >
       <S.Overlay onClick={() => dispatch(close())}></S.Overlay>
-      <S.Sidebar>
+      <S.Sidebar className="Sidebar">
         {items.length > 0 ? (
           <>
             <S.Title>

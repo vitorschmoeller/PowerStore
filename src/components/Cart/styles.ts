@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import { breakpoints, colors } from '../../styles'
 import garbage from '../../assets/images/lixo.svg'
+
 export const Overlay = styled.div`
   position: absolute;
   top: 0;
@@ -10,6 +11,7 @@ export const Overlay = styled.div`
   background-color: #000;
   opacity: 0.7;
 `
+
 export const CartContainer = styled.div`
   position: fixed;
   top: 0;
@@ -18,28 +20,38 @@ export const CartContainer = styled.div`
   height: 100%;
   display: none;
   justify-content: flex-end;
-  overflow-y: auto;
+  z-index: 1;
 
   &.is-open {
     display: flex;
   }
+  @media (max-width: ${breakpoints.tablet}) {
+    justify-content: center;
+    left: -170px;
+  }
 `
+
 export const Sidebar = styled.aside`
   background-color: ${colors.white};
   z-index: 1;
-  padding: 16px 0 16px;
+  padding: 16px;
   max-width: 400px;
   width: 100%;
 
+  @media (max-width: ${breakpoints.tablet}) {
+    max-width: 340px;
+    width: 100%;
+
+
+    position: fixed;
+    height: 100%;
+    overflow-y: auto;
+  }
   .empty-text {
     font-size: 14px;
     line-height: 22px;
     font-weight: bold;
     text-align: center;
-  }
-  @media (max-width: ${breakpoints.tablet}) {
-    max-width: 320px;
-  }
 `
 export const ProductContainer = styled.div`
   margin: 8px 8px;
