@@ -137,16 +137,16 @@ const Checkout = () => {
       for (let i = 1; i <= 6; i++) {
         installmentsArray.push({
           quantity: i,
-          amount: totalPrice / i,
-          formattedAmount: parseToBrl(totalPrice / i)
+          amount: discountedTotal / i,
+          formattedAmount: parseToBrl(discountedTotal / i)
         })
       }
       return installmentsArray
     }
-    if (totalPrice > 0) {
+    if (discountedTotal > 0) {
       setInstallments(calculateInstallments())
     }
-  }, [totalPrice])
+  }, [discountedTotal])
   const checkInputHasError = (fieldName: string) => {
     const isTouched = fieldName in form.touched
     const isInvalid = fieldName in form.errors
