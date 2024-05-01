@@ -47,14 +47,14 @@ const Cart = () => {
                   </S.CartItem>
                 ))}
               </ul>
-              <S.Quantity>{items.length} suplemento(s) no carrinho</S.Quantity>
+              <S.Quantity>{items.length} Supplement(s) in the cart</S.Quantity>
               <S.Prices>
-                Total de {parseToBrl(getTotalPrice(items))}{' '}
+                Total of {parseToBrl(getTotalPrice(items))}{' '}
                 <span>Em até 6x sem juros</span>
               </S.Prices>
               <div>
                 <S.ButtonCheckout type="button" onClick={goToCheckout}>
-                  Continuar com a compra
+                  Continue with the purchase
                 </S.ButtonCheckout>
               </div>
             </S.ProductContainer>
